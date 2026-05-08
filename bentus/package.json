@@ -1,0 +1,18 @@
+{
+  "name": "sportflow-manager",
+  "version": "1.0.0",
+  "description": "Sistema web para gerenciamento esportivo de personal trainers, assessorias e equipes.",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "keywords": [
+    "fitness",
+    "personal-trainer",
+    "sports",
+    "training"
+  ],
+  "author": "",
+  "license": "MIT"
+}
