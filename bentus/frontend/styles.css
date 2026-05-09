@@ -397,6 +397,70 @@ button {
   margin-top: 0;
 }
 
+.assessment-head {
+  margin-top: 22px;
+}
+
+.assessment-card {
+  display: grid;
+  gap: 14px;
+}
+
+.assessment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.assessment-metric {
+  min-height: 86px;
+  display: grid;
+  align-content: space-between;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(182, 255, 77, 0.055);
+}
+
+.assessment-metric span,
+.assessment-metric small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.assessment-metric strong {
+  font-size: 1.25rem;
+}
+
+.assessment-history {
+  display: grid;
+  gap: 8px;
+}
+
+.assessment-history-item {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) 2fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.assessment-history-item .muted {
+  display: block;
+  margin-top: 3px;
+}
+
+.empty-state {
+  padding: 16px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
 .table-card {
   overflow: auto;
 }
@@ -729,6 +793,8 @@ th {
   .grid.cols-3,
   .grid.cols-4,
   .finance-filters,
+  .assessment-grid,
+  .assessment-history-item,
   .exercise-row,
   .form-grid {
     grid-template-columns: 1fr;

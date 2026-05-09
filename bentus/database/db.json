@@ -63,6 +63,17 @@
       "avatar": "",
       "studentId": "s-78c87aa2aa",
       "createdAt": "2026-05-08T18:07:52.923Z"
+    },
+    {
+      "id": "u-bd55e9bc4c",
+      "name": "adsfsadf",
+      "email": "sadsadsd@gmail.com.br",
+      "password": "123456",
+      "role": "student",
+      "phone": "sdadsdas",
+      "avatar": "",
+      "studentId": "s-1a54c1e5cc",
+      "createdAt": "2026-05-09T02:06:57.060Z"
     }
   ],
   "sports": [
@@ -173,6 +184,23 @@
       ],
       "trainerId": "u-trainer",
       "createdAt": "2026-05-08T18:48:30.154Z"
+    },
+    {
+      "id": "s-1a54c1e5cc",
+      "name": "adsfsadf",
+      "birthDate": "1212-01-12",
+      "phone": "sdadsdas",
+      "email": "sadsadsd@gmail.com.br",
+      "sportId": "sp-1",
+      "goal": "sdasdsd",
+      "notes": "asdasdsadsa",
+      "status": "active",
+      "createdAt": "2026-05-09T02:06:57.060Z",
+      "trainerId": "u-c90043e913",
+      "trainerIds": [
+        "u-c90043e913"
+      ],
+      "userId": "u-bd55e9bc4c"
     }
   ],
   "groups": [
@@ -458,6 +486,26 @@
       "trainerId": "u-c90043e913",
       "updatedAt": "2026-05-08T19:54:11.260Z",
       "headerSubtitle": "CONSULTORIA ONLINE"
+    }
+  ],
+  "physicalAssessments": [
+    {
+      "id": "pa-132a47aa71",
+      "studentId": "s-78c87aa2aa",
+      "assessmentDate": "2026-05-09",
+      "weight": "213",
+      "height": "232",
+      "imc": "39.6",
+      "bodyFat": "2323",
+      "muscleMass": "213123",
+      "waist": "23123",
+      "arm": "123",
+      "leg": "23",
+      "hip": "213123",
+      "goal": "Manter a forma",
+      "notes": "21312",
+      "createdAt": "2026-05-09T02:06:27.143Z",
+      "trainerId": "u-c90043e913"
     }
   ]
 }

@@ -12,6 +12,7 @@ const state = {
   editing: null,
   pdfPreview: null,
   financeFilters: { search: "", status: "", planId: "", month: "", sportId: "" },
+  selectedAssessmentStudentId: "",
   sidebarOpen: false
 };
 
@@ -71,6 +72,8 @@ const dateBR = (value) => value ? new Date(`${value}T12:00:00`).toLocaleDateStri
 const monthKey = (value = todayISO()) => String(value).slice(0, 7);
 const planName = (id) => state.data?.financialPlans?.find((plan) => plan.id === id)?.name || "Sem plano";
 const planValue = (id) => Number(state.data?.financialPlans?.find((plan) => plan.id === id)?.monthlyValue || 0);
+const numberValue = (value) => Number(String(value || "").replace(",", ".")) || 0;
+const formatMeasure = (value, suffix = "") => value || value === 0 ? `${String(value).replace(".", ",")}${suffix}` : "-";
 
 function paymentStatus(payment) {
   if (payment.status === "paid") return "paid";
@@ -86,6 +89,22 @@ function parseMoney(value) {
   if (typeof value === "number") return value;
   const normalized = String(value || "0").replace(/[R$\s.]/g, "").replace(",", ".");
   return Number(normalized) || 0;
+}
+
+function calculateImc(weight, height) {
+  const weightValue = numberValue(weight);
+  const heightValue = numberValue(height);
+  const meters = heightValue > 3 ? heightValue / 100 : heightValue;
+  if (!weightValue || !meters) return "";
+  return (weightValue / (meters * meters)).toFixed(1);
+}
+
+function updateAssessmentImc(form) {
+  if (!form || form.dataset.type !== "physicalAssessment") return;
+  const imcInput = form.elements.imc;
+  if (!imcInput) return;
+  const imc = calculateImc(form.elements.weight?.value, form.elements.height?.value);
+  if (imc) imcInput.value = imc;
 }
 
 function workoutExercises(workout = {}) {
@@ -259,6 +278,7 @@ function eventCard(event) {
 }
 
 function studentsView() {
+  const selectedStudent = state.data.students.find((student) => student.id === state.selectedAssessmentStudentId);
   return `
     <section class="section-head">
       <div><h2>Cadastro de alunos</h2><p class="muted">Gerencie perfil, objetivo, modalidade e observações.</p></div>
@@ -273,9 +293,75 @@ function studentsView() {
           <td>${linkedStudentUser(student) ? `<span class="chip" title="Este aluno consegue entrar pelo login de aluno">Com acesso</span>` : `<span class="chip" title="Ao salvar um e-mail válido, o sistema cria acesso inicial com senha 123456">Sem acesso</span>`}</td>
           <td>${escapeHtml(student.sportName)}</td>
           <td>${escapeHtml(student.goal || "")}</td>
-          <td><div class="actions"><button class="btn secondary" data-edit="student:${student.id}">Editar</button><button class="btn danger" data-delete="students:${student.id}">Remover</button></div></td>
+          <td><div class="actions"><button class="btn secondary" data-assessment-student="${student.id}">Avaliação</button><button class="btn secondary" data-edit="student:${student.id}">Editar</button><button class="btn danger" data-delete="students:${student.id}">Remover</button></div></td>
         </tr>`).join("")}</tbody>
-    </table></div>`;
+    </table></div>
+    ${selectedStudent ? physicalAssessmentsView(selectedStudent) : ""}`;
+}
+
+function studentAssessments(studentId) {
+  return [...(state.data.physicalAssessments || [])]
+    .filter((assessment) => assessment.studentId === studentId)
+    .sort((a, b) => String(b.assessmentDate || "").localeCompare(String(a.assessmentDate || "")));
+}
+
+function assessmentDelta(current, previous, key, suffix = "") {
+  if (!current || !previous || current[key] === "" || previous[key] === "" || current[key] == null || previous[key] == null) return "";
+  const diff = numberValue(current[key]) - numberValue(previous[key]);
+  if (!diff) return "sem variação";
+  return `${diff > 0 ? "+" : ""}${String(diff.toFixed(1)).replace(".", ",")}${suffix}`;
+}
+
+function assessmentMetric(label, value, delta = "") {
+  return `<div class="assessment-metric"><span>${label}</span><strong>${escapeHtml(value || "-")}</strong>${delta ? `<small>${escapeHtml(delta)}</small>` : ""}</div>`;
+}
+
+function assessmentHistory(assessments) {
+  if (!assessments.length) return `<p class="muted">Nenhuma avaliação cadastrada para este aluno.</p>`;
+  return `<div class="assessment-history">${assessments.map((assessment, index) => `
+    <div class="assessment-history-item">
+      <div><strong>${dateBR(assessment.assessmentDate)}</strong><span class="muted">${index === 0 ? "Atual" : "Histórico"}</span></div>
+      <div class="actions">
+        <span class="chip">${formatMeasure(assessment.weight, " kg")}</span>
+        <span class="chip">IMC ${formatMeasure(assessment.imc)}</span>
+        <span class="chip">${formatMeasure(assessment.bodyFat, "% gordura")}</span>
+      </div>
+      <button class="btn secondary" data-edit="physicalAssessment:${assessment.id}">Editar</button>
+    </div>`).join("")}</div>`;
+}
+
+function physicalAssessmentsView(student) {
+  const assessments = studentAssessments(student.id);
+  const current = assessments[0];
+  const previous = assessments[1];
+  return `
+    <section class="section-head assessment-head">
+      <div><h2>Avalia&ccedil;&atilde;o F&iacute;sica</h2><p class="muted">${escapeHtml(student.name)} - acompanhe hist&oacute;rico e evolu&ccedil;&atilde;o.</p></div>
+      <div class="actions">
+        <button class="btn secondary" data-action="close-assessment">Fechar</button>
+        <button class="btn" data-modal-assessment="${student.id}">Nova avalia&ccedil;&atilde;o</button>
+      </div>
+    </section>
+    <div class="grid">
+      <article class="card assessment-card">
+        <div class="section-head">
+          <div class="student-cell">${student.photo ? `<img class="photo" src="${student.photo}" alt="">` : `<span class="photo">${initials(student.name)}</span>`}<div><h3>${escapeHtml(student.name)}</h3><p class="muted">${escapeHtml(student.sportName)} - ${assessments.length} avalia&ccedil;&otilde;es</p></div></div>
+        </div>
+        ${current ? `
+          <div class="assessment-grid">
+            ${assessmentMetric("Peso", formatMeasure(current.weight, " kg"), assessmentDelta(current, previous, "weight", " kg"))}
+            ${assessmentMetric("Altura", formatMeasure(current.height, " cm"))}
+            ${assessmentMetric("IMC", formatMeasure(current.imc), assessmentDelta(current, previous, "imc"))}
+            ${assessmentMetric("Gordura", formatMeasure(current.bodyFat, "%"), assessmentDelta(current, previous, "bodyFat", "%"))}
+            ${assessmentMetric("Massa muscular", formatMeasure(current.muscleMass, " kg"), assessmentDelta(current, previous, "muscleMass", " kg"))}
+            ${assessmentMetric("Abdomen", formatMeasure(current.waist, " cm"), assessmentDelta(current, previous, "waist", " cm"))}
+          </div>
+          <p class="muted">${escapeHtml(current.notes || "")}</p>
+        ` : `<div class="empty-state"><strong>Sem avalia&ccedil;&atilde;o ainda</strong><p class="muted">Cadastre a primeira avalia&ccedil;&atilde;o para acompanhar medidas e evolu&ccedil;&atilde;o.</p></div>`}
+        <h4>Hist&oacute;rico</h4>
+        ${assessmentHistory(assessments)}
+      </article>
+    </div>`;
 }
 
 function sportsView() {
@@ -1263,6 +1349,7 @@ function modal() {
     <optgroup label="Grupos">${state.data.groups.map((group) => `<option value="group:${group.id}">${escapeHtml(group.name)}</option>`).join("")}</optgroup>`;
   const planOptions = (state.data.financialPlans || []).map((plan) => `<option value="${plan.id}">${escapeHtml(plan.name)}</option>`).join("");
   const studentOptions = state.data.students.map((student) => `<option value="${student.id}">${escapeHtml(student.name)}</option>`).join("");
+  const assessmentStudentId = item?.studentId || state.editing.studentId || state.data.students[0]?.id || "";
   const currentTarget = item?.targetType ? `${item.targetType}:${item.targetId}` : "";
   const forms = {
     student: `
@@ -1316,7 +1403,21 @@ function modal() {
       <label class="field"><span>Vencimento</span><input type="date" name="dueDate" required value="${item?.dueDate || todayISO()}"></label>
       <label class="field"><span>Data de pagamento</span><input type="date" name="paidDate" value="${item?.paidDate || ""}"></label>
       <label class="field"><span>Status</span><select name="status"><option value="pending">Pendente</option><option value="paid">Pago</option><option value="overdue">Atrasado</option></select></label>
-      <label class="field span-2"><span>Observacoes</span><textarea name="notes">${escapeHtml(item?.notes || "")}</textarea></label>`
+      <label class="field span-2"><span>Observacoes</span><textarea name="notes">${escapeHtml(item?.notes || "")}</textarea></label>`,
+    physicalAssessment: `
+      <label class="field"><span>Aluno</span><select name="studentId" required>${studentOptions}</select></label>
+      <label class="field"><span>Data da avaliação</span><input type="date" name="assessmentDate" required value="${item?.assessmentDate || todayISO()}"></label>
+      <label class="field"><span>Peso (kg)</span><input name="weight" inputmode="decimal" value="${escapeHtml(item?.weight || "")}" placeholder="78,5"></label>
+      <label class="field"><span>Altura (cm)</span><input name="height" inputmode="decimal" value="${escapeHtml(item?.height || "")}" placeholder="178"></label>
+      <label class="field"><span>IMC</span><input name="imc" inputmode="decimal" value="${escapeHtml(item?.imc || "")}" placeholder="Calculado automaticamente"></label>
+      <label class="field"><span>Percentual de gordura (%)</span><input name="bodyFat" inputmode="decimal" value="${escapeHtml(item?.bodyFat || "")}" placeholder="18"></label>
+      <label class="field"><span>Massa muscular (kg)</span><input name="muscleMass" inputmode="decimal" value="${escapeHtml(item?.muscleMass || "")}" placeholder="34"></label>
+      <label class="field"><span>Circ. abdominal (cm)</span><input name="waist" inputmode="decimal" value="${escapeHtml(item?.waist || "")}" placeholder="86"></label>
+      <label class="field"><span>Circ. braço (cm)</span><input name="arm" inputmode="decimal" value="${escapeHtml(item?.arm || "")}" placeholder="34"></label>
+      <label class="field"><span>Circ. perna (cm)</span><input name="leg" inputmode="decimal" value="${escapeHtml(item?.leg || "")}" placeholder="58"></label>
+      <label class="field"><span>Circ. quadril (cm)</span><input name="hip" inputmode="decimal" value="${escapeHtml(item?.hip || "")}" placeholder="96"></label>
+      <label class="field span-2"><span>Objetivo do aluno</span><input name="goal" value="${escapeHtml(item?.goal || state.data.students.find((student) => student.id === assessmentStudentId)?.goal || "")}"></label>
+      <label class="field span-2"><span>Observações do personal</span><textarea name="notes">${escapeHtml(item?.notes || "")}</textarea></label>`
   };
   setTimeout(() => {
     const form = document.querySelector("#entityForm");
@@ -1325,6 +1426,7 @@ function modal() {
     if (currentTarget) form.target && (form.target.value = currentTarget);
     if (item?.status) form.status && (form.status.value = item.status);
     if (item?.studentId) form.studentId && (form.studentId.value = item.studentId);
+    if (!item?.studentId && assessmentStudentId) form.studentId && (form.studentId.value = assessmentStudentId);
     if (item?.planId) form.planId && (form.planId.value = item.planId);
   });
   return `
@@ -1340,7 +1442,7 @@ function modal() {
 }
 
 function labelFor(type) {
-  return ({ student: "aluno", sport: "modalidade", group: "grupo", workout: "treino", event: "evento", message: "aviso", financialPlan: "plano", payment: "pagamento" })[type] || "registro";
+  return ({ student: "aluno", sport: "modalidade", group: "grupo", workout: "treino", event: "evento", message: "aviso", financialPlan: "plano", payment: "pagamento", physicalAssessment: "avaliação física" })[type] || "registro";
 }
 
 async function saveEntity(form) {
@@ -1380,13 +1482,22 @@ async function saveEntity(form) {
     data.amount = parseMoney(data.amount);
     if (data.status === "paid" && !data.paidDate) data.paidDate = todayISO();
   }
+  if (type === "physicalAssessment") {
+    updateAssessmentImc(form);
+    const refreshed = Object.fromEntries(new FormData(form).entries());
+    Object.assign(data, refreshed);
+    ["weight", "height", "imc", "bodyFat", "muscleMass", "waist", "arm", "leg", "hip"].forEach((key) => {
+      data[key] = String(data[key] || "").replace(",", ".");
+    });
+    data.imc = data.imc || calculateImc(data.weight, data.height);
+  }
   if (["workout", "message"].includes(type)) {
     const [targetType, targetId] = data.target.split(":");
     data.targetType = targetType;
     data.targetId = targetId;
     delete data.target;
   }
-  const endpoint = { student: "students", sport: "sports", group: "groups", workout: "workouts", event: "events", message: "messages", financialPlan: "financialPlans", payment: "payments" }[type];
+  const endpoint = { student: "students", sport: "sports", group: "groups", workout: "workouts", event: "events", message: "messages", financialPlan: "financialPlans", payment: "payments", physicalAssessment: "physicalAssessments" }[type];
   const editingId = state.editing.item?.id;
   await api(editingId ? `${endpoint}/${editingId}` : endpoint, { method: editingId ? "PUT" : "POST", body: JSON.stringify(data) });
   state.editing = null;
@@ -1534,6 +1645,7 @@ document.addEventListener("click", async (event) => {
   if (button.dataset.view) {
     state.view = button.dataset.view;
     state.sidebarOpen = false;
+    if (state.view !== "students") state.selectedAssessmentStudentId = "";
     return render();
   }
   if (button.dataset.action === "logout") return logout();
@@ -1543,6 +1655,10 @@ document.addEventListener("click", async (event) => {
   }
   if (button.dataset.action === "close") {
     state.editing = null;
+    return render();
+  }
+  if (button.dataset.action === "close-assessment") {
+    state.selectedAssessmentStudentId = "";
     return render();
   }
   if (button.dataset.action === "add-exercise") {
@@ -1571,6 +1687,14 @@ document.addEventListener("click", async (event) => {
     state.editing = { type: button.dataset.modal, item: null };
     return render();
   }
+  if (button.dataset.assessmentStudent) {
+    state.selectedAssessmentStudentId = button.dataset.assessmentStudent;
+    return render();
+  }
+  if (button.dataset.modalAssessment) {
+    state.editing = { type: "physicalAssessment", item: null, studentId: button.dataset.modalAssessment };
+    return render();
+  }
   if (button.dataset.pdf) return openWorkoutPdf(button.dataset.pdf);
   if (button.dataset.paid) {
     const payment = state.data.payments.find((item) => item.id === button.dataset.paid);
@@ -1583,7 +1707,7 @@ document.addEventListener("click", async (event) => {
   if (button.dataset.action === "finance-pdf") return openFinancePdf();
   if (button.dataset.edit) {
     const [type, itemId] = button.dataset.edit.split(":");
-    const collection = { student: "students", sport: "sports", group: "groups", workout: "workouts", message: "messages", financialPlan: "financialPlans", payment: "payments" }[type];
+    const collection = { student: "students", sport: "sports", group: "groups", workout: "workouts", message: "messages", financialPlan: "financialPlans", payment: "payments", physicalAssessment: "physicalAssessments" }[type];
     state.editing = { type, item: state.data[collection].find((item) => item.id === itemId) };
     return render();
   }
@@ -1649,6 +1773,9 @@ document.addEventListener("input", (event) => {
   }
   const form = event.target.closest("#entityForm");
   if (!form) return;
+  if (form.dataset.type === "physicalAssessment" && ["weight", "height"].includes(event.target.name)) {
+    updateAssessmentImc(form);
+  }
   localStorage.setItem("sportflow_draft", JSON.stringify(Object.fromEntries(new FormData(form).entries())));
 });
 

@@ -20,11 +20,14 @@ function normalizeDb(db) {
     }
   };
 
-  db.financialPlans = db.financialPlans || [];
-  db.payments = db.payments || [];
-  db.pdfSettings = db.pdfSettings || [];
+  ["financialPlans", "payments", "pdfSettings", "physicalAssessments"].forEach((collection) => {
+    if (!Array.isArray(db[collection])) {
+      db[collection] = [];
+      changed = true;
+    }
+  });
 
-  ["groups", "workouts", "events", "messages", "financialPlans", "payments", "pdfSettings"].forEach((collection) => {
+  ["groups", "workouts", "events", "messages", "financialPlans", "payments", "pdfSettings", "physicalAssessments"].forEach((collection) => {
     (db[collection] || []).forEach(ensureTrainerId);
   });
 
@@ -84,6 +87,15 @@ const readDb = () => {
 const writeDb = (db) => fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
 const id = (prefix) => `${prefix}-${crypto.randomBytes(5).toString("hex")}`;
 const now = () => new Date().toISOString();
+const numberValue = (value) => Number(String(value || "").replace(",", ".")) || 0;
+
+function calculateImc(weight, height) {
+  const weightValue = numberValue(weight);
+  const heightValue = numberValue(height);
+  const meters = heightValue > 3 ? heightValue / 100 : heightValue;
+  if (!weightValue || !meters) return "";
+  return (weightValue / (meters * meters)).toFixed(1);
+}
 
 function send(res, status, data, headers = {}) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", ...headers });
@@ -148,6 +160,7 @@ function trainerScoped(db, trainerId) {
     messages: db.messages.filter((message) => message.trainerId === trainerId),
     financialPlans: db.financialPlans.filter((plan) => plan.trainerId === trainerId),
     payments: db.payments.filter((payment) => payment.trainerId === trainerId),
+    physicalAssessments: db.physicalAssessments.filter((assessment) => assessment.trainerId === trainerId && studentIds.includes(assessment.studentId)),
     pdfSettings: db.pdfSettings.find((setting) => setting.trainerId === trainerId) || null,
     attendance: db.attendance.filter((item) => {
       const event = db.events.find((eventItem) => eventItem.id === item.eventId);
@@ -281,6 +294,7 @@ async function handleApi(req, res) {
           users: [user],
           financialPlans: [],
           payments: [],
+          physicalAssessments: [],
           pdfSettings: null
         };
       })();
@@ -294,6 +308,7 @@ async function handleApi(req, res) {
         messages: scoped.messages,
         financialPlans: scoped.financialPlans,
         payments: scoped.payments,
+        physicalAssessments: scoped.physicalAssessments,
         pdfSettings: scoped.pdfSettings,
         attendance: scoped.attendance,
         performance: scoped.performance,
@@ -303,7 +318,7 @@ async function handleApi(req, res) {
 
     if (user.role !== "trainer" && !["complete-workout", "attendance"].includes(parts[0])) return send(res, 403, { error: "Permissão insuficiente." });
 
-    const collections = { sports: "sp", students: "s", groups: "g", workouts: "w", events: "e", messages: "m", financialPlans: "fp", payments: "pay", pdfSettings: "pdf" };
+    const collections = { sports: "sp", students: "s", groups: "g", workouts: "w", events: "e", messages: "m", financialPlans: "fp", payments: "pay", pdfSettings: "pdf", physicalAssessments: "pa" };
     const collection = parts[0];
     if (collections[collection]) {
       if (method === "POST") {
@@ -311,6 +326,11 @@ async function handleApi(req, res) {
         const item = { id: id(collections[collection]), ...body, createdAt: now() };
         if (collection !== "sports") item.trainerId = user.id;
         if (collection === "workouts") item.completedBy = [];
+        if (collection === "physicalAssessments") {
+          const student = db.students.find((entry) => entry.id === item.studentId);
+          if (!student || (!((student.trainerIds || []).includes(user.id)) && student.trainerId !== user.id)) return send(res, 403, { error: "Aluno pertence a outro personal." });
+          item.imc = item.imc || calculateImc(item.weight, item.height);
+        }
         if (collection === "groups") item.studentIds = (item.studentIds || []).filter((studentId) => {
           const student = db.students.find((entry) => entry.id === studentId);
           return student && ((student.trainerIds || []).includes(user.id) || student.trainerId === user.id);
@@ -347,6 +367,11 @@ async function handleApi(req, res) {
             return student && ((student.trainerIds || []).includes(user.id) || student.trainerId === user.id);
           });
         }
+        if (collection === "physicalAssessments" && body.studentId) {
+          const student = db.students.find((entry) => entry.id === body.studentId);
+          if (!student || (!((student.trainerIds || []).includes(user.id)) && student.trainerId !== user.id)) return send(res, 403, { error: "Aluno pertence a outro personal." });
+        }
+        if (collection === "physicalAssessments") body.imc = body.imc || calculateImc(body.weight, body.height);
         db[collection][index] = { ...db[collection][index], ...body, updatedAt: now() };
         if (collection === "students" && body.email) {
           const existingUser = db.users.find((itemUser) => itemUser.email.toLowerCase() === body.email.toLowerCase() && itemUser.role === "student");
