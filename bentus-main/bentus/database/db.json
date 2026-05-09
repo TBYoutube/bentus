@@ -1,0 +1,512 @@
+{
+  "users": [
+    {
+      "id": "u-trainer",
+      "name": "Marina Costa",
+      "email": "personal@demo.com",
+      "password": "123456",
+      "role": "trainer",
+      "phone": "(11) 99999-0101",
+      "avatar": "",
+      "createdAt": "2026-05-08T00:00:00.000Z"
+    },
+    {
+      "id": "u-student",
+      "name": "Lucas Almeida",
+      "email": "aluno@demo.com",
+      "password": "123456",
+      "role": "student",
+      "phone": "(11) 98888-2020",
+      "avatar": "",
+      "studentId": "s-6404b908d3",
+      "createdAt": "2026-05-08T00:00:00.000Z"
+    },
+    {
+      "id": "u-2803bc001b",
+      "name": "Tiago Becker bento",
+      "email": "tiagobeckerbento@gmail.com",
+      "password": "123456",
+      "role": "student",
+      "phone": "(47) 99980-0523",
+      "avatar": "",
+      "createdAt": "2026-05-08T16:53:01.777Z",
+      "studentId": "s-e71f74bb0e"
+    },
+    {
+      "id": "u-3d95173fd9",
+      "name": "Valdeci Bento",
+      "email": "valdecibento02@gmail.com",
+      "password": "20212204",
+      "role": "student",
+      "phone": "",
+      "avatar": "",
+      "createdAt": "2026-05-08T17:03:57.999Z",
+      "studentId": "s-8174516cda"
+    },
+    {
+      "id": "u-c90043e913",
+      "name": "Carlos Alberto Siqueira Junior",
+      "email": "carlosuzi@gmail.com",
+      "password": "20212204",
+      "role": "trainer",
+      "phone": "",
+      "avatar": "",
+      "createdAt": "2026-05-08T17:56:44.162Z"
+    },
+    {
+      "id": "u-c38aa55174",
+      "name": "Josiane Becker",
+      "email": "jobecker86@gmail.com",
+      "password": "123456",
+      "role": "student",
+      "phone": "",
+      "avatar": "",
+      "studentId": "s-78c87aa2aa",
+      "createdAt": "2026-05-08T18:07:52.923Z"
+    },
+    {
+      "id": "u-bd55e9bc4c",
+      "name": "adsfsadf",
+      "email": "sadsadsd@gmail.com.br",
+      "password": "123456",
+      "role": "student",
+      "phone": "sdadsdas",
+      "avatar": "",
+      "studentId": "s-9005cf0cc5",
+      "createdAt": "2026-05-09T02:06:57.060Z"
+    }
+  ],
+  "sports": [
+    {
+      "id": "sp-1",
+      "name": "Corrida",
+      "color": "#00C2A8"
+    },
+    {
+      "id": "sp-2",
+      "name": "Futebol",
+      "color": "#5ee86f"
+    },
+    {
+      "id": "sp-3",
+      "name": "Basquete",
+      "color": "#ffffff"
+    },
+    {
+      "id": "sp-4",
+      "name": "Vôlei",
+      "color": "#87f7bd"
+    },
+    {
+      "id": "sp-5",
+      "name": "Funcional",
+      "color": "#c8ff70"
+    },
+    {
+      "id": "sp-6",
+      "name": "Academia",
+      "color": "#8ef35f"
+    },
+    {
+      "id": "sp-7",
+      "name": "Ciclismo",
+      "color": "#e8ffba"
+    }
+  ],
+  "students": [
+    {
+      "id": "s-78c87aa2aa",
+      "name": "Josiane Becker",
+      "birthDate": "1980-12-30",
+      "phone": "",
+      "email": "jobecker86@gmail.com",
+      "sportId": "sp-6",
+      "goal": "Manter a forma",
+      "notes": "",
+      "status": "active",
+      "createdAt": "2026-05-08T18:07:52.923Z",
+      "trainerId": "u-c90043e913",
+      "trainerIds": [
+        "u-c90043e913"
+      ],
+      "userId": "u-c38aa55174"
+    },
+    {
+      "id": "s-e71f74bb0e",
+      "userId": "u-2803bc001b",
+      "photo": "",
+      "name": "Tiago Becker bento",
+      "birthDate": "",
+      "phone": "(47) 99980-0523",
+      "email": "tiagobeckerbento@gmail.com",
+      "sportId": "sp-1",
+      "goal": "",
+      "notes": "",
+      "status": "active",
+      "trainerIds": [
+        "u-trainer"
+      ],
+      "trainerId": "u-trainer",
+      "createdAt": "2026-05-08T18:48:24.523Z"
+    },
+    {
+      "id": "s-6404b908d3",
+      "userId": "u-student",
+      "photo": "",
+      "name": "Lucas Almeida",
+      "birthDate": "",
+      "phone": "(11) 98888-2020",
+      "email": "aluno@demo.com",
+      "sportId": "sp-1",
+      "goal": "",
+      "notes": "",
+      "status": "active",
+      "trainerIds": [
+        "u-trainer"
+      ],
+      "trainerId": "u-trainer",
+      "createdAt": "2026-05-08T18:48:26.424Z"
+    },
+    {
+      "id": "s-8174516cda",
+      "userId": "u-3d95173fd9",
+      "photo": "",
+      "name": "Valdeci Bento",
+      "birthDate": "",
+      "phone": "",
+      "email": "valdecibento02@gmail.com",
+      "sportId": "sp-1",
+      "goal": "",
+      "notes": "",
+      "status": "active",
+      "trainerIds": [
+        "u-trainer"
+      ],
+      "trainerId": "u-trainer",
+      "createdAt": "2026-05-08T18:48:30.154Z"
+    },
+    {
+      "id": "s-9005cf0cc5",
+      "userId": "u-bd55e9bc4c",
+      "photo": "",
+      "name": "adsfsadf",
+      "birthDate": "",
+      "phone": "sdadsdas",
+      "email": "sadsadsd@gmail.com.br",
+      "sportId": "sp-1",
+      "goal": "",
+      "notes": "",
+      "status": "active",
+      "trainerIds": [],
+      "trainerId": "",
+      "createdAt": "2026-05-09T18:14:29.479Z"
+    }
+  ],
+  "groups": [
+    {
+      "id": "g-6355f86aa8",
+      "name": "Grupo Funcional Manhã",
+      "sportId": "sp-1",
+      "schedule": "Ter e Qui - 07:00",
+      "location": "Tijucas",
+      "studentIds": [
+        "s-e71f74bb0e",
+        "s-6404b908d3"
+      ],
+      "createdAt": "2026-05-08T17:02:54.029Z",
+      "updatedAt": "2026-05-08T17:03:00.081Z",
+      "trainerId": "u-trainer"
+    }
+  ],
+  "workouts": [
+    {
+      "id": "w-1",
+      "title": "Intervalado 6x400m",
+      "exercise": "Aquecimento 10 min, tiros de 400m, desaquecimento",
+      "sets": "6",
+      "reps": "400m forte + 90s leve",
+      "distance": "4 km",
+      "time": "45 min",
+      "notes": "Manter pace controlado nos dois primeiros tiros.",
+      "targetType": "student",
+      "targetId": "s-6404b908d3",
+      "date": "2026-05-09",
+      "completedBy": [],
+      "createdAt": "2026-05-08T00:00:00.000Z",
+      "trainerId": "u-trainer"
+    },
+    {
+      "id": "w-2",
+      "title": "Funcional força total",
+      "exercise": "Agachamento, remada, prancha, burpee",
+      "sets": "4",
+      "reps": "12",
+      "distance": "",
+      "time": "50 min",
+      "notes": "Descanso de 45s por estação.",
+      "targetType": "group",
+      "targetId": "g-6355f86aa8",
+      "date": "2026-05-10",
+      "completedBy": [],
+      "createdAt": "2026-05-08T00:00:00.000Z",
+      "trainerId": "u-trainer"
+    },
+    {
+      "id": "w-7654d5e136",
+      "title": "Treino Maio",
+      "date": "2026-05-08",
+      "time": "1 Mês",
+      "rest": "",
+      "distance": "",
+      "notes": "Progredir carga aos poucos",
+      "exercises": [
+        {
+          "name": "Leg Press",
+          "sets": "3",
+          "reps": "10",
+          "rest": "2 Min"
+        },
+        {
+          "name": "Extensora",
+          "sets": "3",
+          "reps": "10",
+          "rest": "2 Min"
+        }
+      ],
+      "exercise": "Leg Press\nExtensora",
+      "sets": "",
+      "reps": "",
+      "targetType": "student",
+      "targetId": "s-78c87aa2aa",
+      "createdAt": "2026-05-08T18:26:01.415Z",
+      "trainerId": "u-c90043e913",
+      "completedBy": [
+        "s-78c87aa2aa"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": "e-1",
+      "title": "Treino técnico - Running Elite",
+      "date": "2026-05-09",
+      "time": "06:30",
+      "location": "Parque Central",
+      "groupId": "g-6355f86aa8",
+      "studentId": "",
+      "type": "Treino",
+      "trainerId": "u-trainer"
+    },
+    {
+      "id": "e-2",
+      "title": "Avaliação física Lucas",
+      "date": "2026-05-11",
+      "time": "08:00",
+      "location": "Studio Box 4",
+      "groupId": "",
+      "studentId": "s-6404b908d3",
+      "type": "Avaliação",
+      "trainerId": "u-trainer"
+    }
+  ],
+  "attendance": [
+    {
+      "id": "a-1",
+      "eventId": "e-1",
+      "studentId": "s-6404b908d3",
+      "checkedAt": "2026-05-08T00:00:00.000Z"
+    }
+  ],
+  "performance": [
+    {
+      "id": "p-1",
+      "studentId": "s-6404b908d3",
+      "score": 92,
+      "completed": 8,
+      "streak": 4
+    },
+    {
+      "id": "p-2",
+      "studentId": "s-e71f74bb0e",
+      "score": 84,
+      "completed": 5,
+      "streak": 2
+    },
+    {
+      "id": "p-f8f018c9e5",
+      "studentId": "s-78c87aa2aa",
+      "score": 72,
+      "completed": 1,
+      "streak": 1
+    }
+  ],
+  "permissions": {
+    "trainer": [
+      "manage_students",
+      "manage_groups",
+      "manage_sports",
+      "manage_workouts",
+      "manage_schedule",
+      "send_messages",
+      "view_reports",
+      "manage_finance",
+      "manage_nutrition_plans",
+      "manage_pdf_settings"
+    ],
+    "student": [
+      "view_workouts",
+      "complete_workouts",
+      "view_profile",
+      "view_schedule"
+    ]
+  },
+  "financialPlans": [
+    {
+      "id": "fp-demo-corrida",
+      "trainerId": "u-trainer",
+      "name": "Plano Corrida Basico",
+      "monthlyValue": 120,
+      "sportId": "sp-1",
+      "description": "Acompanhamento mensal para corrida.",
+      "status": "active",
+      "createdAt": "2026-05-08T18:29:02.935Z"
+    },
+    {
+      "id": "fp-demo-academia",
+      "trainerId": "u-trainer",
+      "name": "Plano Academia Individual",
+      "monthlyValue": 250,
+      "sportId": "sp-6",
+      "description": "Treino individual com acompanhamento.",
+      "status": "active",
+      "createdAt": "2026-05-08T18:29:02.936Z"
+    },
+    {
+      "id": "fp-38fb7bb2e2",
+      "name": "Plano Completo",
+      "monthlyValue": 750,
+      "sportId": "sp-6",
+      "status": "active",
+      "description": "Treino + Avaliação + Plano Alimentar",
+      "createdAt": "2026-05-08T18:45:07.981Z",
+      "trainerId": "u-c90043e913"
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay-demo-1",
+      "trainerId": "u-trainer",
+      "studentId": "s-e71f74bb0e",
+      "planId": "fp-demo-corrida",
+      "amount": 120,
+      "dueDate": "2026-05-03",
+      "paidDate": "",
+      "status": "overdue",
+      "notes": "",
+      "createdAt": "2026-05-08T18:29:02.936Z"
+    },
+    {
+      "id": "pay-demo-2",
+      "trainerId": "u-trainer",
+      "studentId": "s-6404b908d3",
+      "planId": "fp-demo-academia",
+      "amount": 250,
+      "dueDate": "2026-05-11",
+      "paidDate": "",
+      "status": "pending",
+      "notes": "",
+      "createdAt": "2026-05-08T18:29:02.936Z"
+    },
+    {
+      "id": "pay-demo-3",
+      "trainerId": "u-trainer",
+      "studentId": "s-8174516cda",
+      "planId": "fp-demo-corrida",
+      "amount": 120,
+      "dueDate": "2026-05-18",
+      "paidDate": "2026-05-08",
+      "status": "paid",
+      "notes": "",
+      "createdAt": "2026-05-08T18:29:02.936Z"
+    },
+    {
+      "id": "pay-1e89c0d8a0",
+      "studentId": "s-78c87aa2aa",
+      "planId": "fp-38fb7bb2e2",
+      "amount": 750,
+      "dueDate": "2026-05-15",
+      "paidDate": "2026-05-08",
+      "status": "paid",
+      "notes": "",
+      "createdAt": "2026-05-08T18:45:50.465Z",
+      "trainerId": "u-c90043e913"
+    }
+  ],
+  "pdfSettings": [
+    {
+      "id": "pdf-18603edc55",
+      "showCref": true,
+      "footerText": "Treino personalizado por Marina Costa.",
+      "showInstagram": true,
+      "instagram": "@marinaperformance",
+      "showPhone": true,
+      "cref": "000000-G/SP",
+      "primaryColor": "#00C2A8",
+      "logo": "",
+      "phone": "(11) 99999-0101",
+      "displayName": "Marina Costa Performance",
+      "createdAt": "2026-05-08T18:59:36.732Z",
+      "trainerId": "u-trainer",
+      "updatedAt": "2026-05-08T19:12:59.022Z"
+    },
+    {
+      "id": "pdf-fae5dc1850",
+      "displayName": "Carlos Assessoria",
+      "phone": "47999800523",
+      "instagram": "carlosuzitreinador",
+      "cref": "",
+      "primaryColor": "#00C2A8",
+      "showPhone": true,
+      "showInstagram": true,
+      "showCref": true,
+      "footerText": "Documento gerado pelo Relay by Bentus.",
+      "logo": "data:image/jpeg;base64,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",
+      "createdAt": "2026-05-08T19:01:07.006Z",
+      "trainerId": "u-c90043e913",
+      "updatedAt": "2026-05-08T19:54:11.260Z",
+      "headerSubtitle": "CONSULTORIA ONLINE"
+    }
+  ],
+  "physicalAssessments": [
+    {
+      "id": "pa-132a47aa71",
+      "studentId": "s-78c87aa2aa",
+      "assessmentDate": "2026-05-09",
+      "weight": "213",
+      "height": "232",
+      "imc": "39.6",
+      "bodyFat": "2323",
+      "muscleMass": "213123",
+      "waist": "23123",
+      "arm": "123",
+      "leg": "23",
+      "hip": "213123",
+      "goal": "Manter a forma",
+      "notes": "21312",
+      "createdAt": "2026-05-09T02:06:27.143Z",
+      "trainerId": "u-c90043e913"
+    }
+  ],
+  "nutritionPlans": [],
+  "messages": [
+    {
+      "id": "m-1",
+      "title": "Hidratação",
+      "body": "Levar garrafa de água e chegar 10 minutos antes do treino.",
+      "targetType": "all",
+      "targetId": "",
+      "createdAt": "2026-05-08T00:00:00.000Z",
+      "trainerId": "u-trainer"
+    }
+  ]
+}
