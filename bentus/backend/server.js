@@ -20,14 +20,20 @@ function normalizeDb(db) {
     }
   };
 
-  ["financialPlans", "payments", "pdfSettings", "physicalAssessments"].forEach((collection) => {
+  if (Array.isArray(db["m?ssages"]) && !Array.isArray(db.messages)) {
+    db.messages = db["m?ssages"];
+    delete db["m?ssages"];
+    changed = true;
+  }
+
+  ["users", "sports", "students", "groups", "workouts", "events", "messages", "attendance", "performance", "financialPlans", "payments", "pdfSettings", "physicalAssessments", "nutritionPlans"].forEach((collection) => {
     if (!Array.isArray(db[collection])) {
       db[collection] = [];
       changed = true;
     }
   });
 
-  ["groups", "workouts", "events", "messages", "financialPlans", "payments", "pdfSettings", "physicalAssessments"].forEach((collection) => {
+  ["groups", "workouts", "events", "messages", "financialPlans", "payments", "pdfSettings", "physicalAssessments", "nutritionPlans"].forEach((collection) => {
     (db[collection] || []).forEach(ensureTrainerId);
   });
 
@@ -80,7 +86,7 @@ function normalizeDb(db) {
 }
 
 const readDb = () => {
-  const db = JSON.parse(fs.readFileSync(dbPath, "utf8"));
+  const db = JSON.parse(fs.readFileSync(dbPath, "utf8").replace(/^\uFEFF/, ""));
   if (normalizeDb(db)) writeDb(db);
   return db;
 };
@@ -161,6 +167,7 @@ function trainerScoped(db, trainerId) {
     financialPlans: db.financialPlans.filter((plan) => plan.trainerId === trainerId),
     payments: db.payments.filter((payment) => payment.trainerId === trainerId),
     physicalAssessments: db.physicalAssessments.filter((assessment) => assessment.trainerId === trainerId && studentIds.includes(assessment.studentId)),
+    nutritionPlans: db.nutritionPlans.filter((plan) => plan.trainerId === trainerId && studentIds.includes(plan.studentId)),
     pdfSettings: db.pdfSettings.find((setting) => setting.trainerId === trainerId) || null,
     attendance: db.attendance.filter((item) => {
       const event = db.events.find((eventItem) => eventItem.id === item.eventId);
@@ -236,7 +243,7 @@ function serveStatic(req, res) {
       return res.end("Not found");
     }
     const ext = path.extname(filePath);
-    const types = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml; charset=utf-8" };
+    const types = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml; charset=utf-8", ".webmanifest": "application/manifest+json; charset=utf-8" };
     res.writeHead(200, { "Content-Type": types[ext] || "application/octet-stream" });
     res.end(content);
   });
@@ -295,6 +302,7 @@ async function handleApi(req, res) {
           financialPlans: [],
           payments: [],
           physicalAssessments: [],
+          nutritionPlans: [],
           pdfSettings: null
         };
       })();
@@ -309,6 +317,7 @@ async function handleApi(req, res) {
         financialPlans: scoped.financialPlans,
         payments: scoped.payments,
         physicalAssessments: scoped.physicalAssessments,
+        nutritionPlans: scoped.nutritionPlans,
         pdfSettings: scoped.pdfSettings,
         attendance: scoped.attendance,
         performance: scoped.performance,
@@ -318,7 +327,7 @@ async function handleApi(req, res) {
 
     if (user.role !== "trainer" && !["complete-workout", "attendance"].includes(parts[0])) return send(res, 403, { error: "Permissão insuficiente." });
 
-    const collections = { sports: "sp", students: "s", groups: "g", workouts: "w", events: "e", messages: "m", financialPlans: "fp", payments: "pay", pdfSettings: "pdf", physicalAssessments: "pa" };
+    const collections = { sports: "sp", students: "s", groups: "g", workouts: "w", events: "e", messages: "m", financialPlans: "fp", payments: "pay", pdfSettings: "pdf", physicalAssessments: "pa", nutritionPlans: "np" };
     const collection = parts[0];
     if (collections[collection]) {
       if (method === "POST") {
@@ -326,10 +335,10 @@ async function handleApi(req, res) {
         const item = { id: id(collections[collection]), ...body, createdAt: now() };
         if (collection !== "sports") item.trainerId = user.id;
         if (collection === "workouts") item.completedBy = [];
-        if (collection === "physicalAssessments") {
+        if (collection === "physicalAssessments" || collection === "nutritionPlans") {
           const student = db.students.find((entry) => entry.id === item.studentId);
           if (!student || (!((student.trainerIds || []).includes(user.id)) && student.trainerId !== user.id)) return send(res, 403, { error: "Aluno pertence a outro personal." });
-          item.imc = item.imc || calculateImc(item.weight, item.height);
+          if (collection === "physicalAssessments") item.imc = item.imc || calculateImc(item.weight, item.height);
         }
         if (collection === "groups") item.studentIds = (item.studentIds || []).filter((studentId) => {
           const student = db.students.find((entry) => entry.id === studentId);
@@ -367,7 +376,7 @@ async function handleApi(req, res) {
             return student && ((student.trainerIds || []).includes(user.id) || student.trainerId === user.id);
           });
         }
-        if (collection === "physicalAssessments" && body.studentId) {
+        if ((collection === "physicalAssessments" || collection === "nutritionPlans") && body.studentId) {
           const student = db.students.find((entry) => entry.id === body.studentId);
           if (!student || (!((student.trainerIds || []).includes(user.id)) && student.trainerId !== user.id)) return send(res, 403, { error: "Aluno pertence a outro personal." });
         }
@@ -450,5 +459,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`SportFlow rodando em http://localhost:${PORT}`);
+  console.log(`Relay by Bentus rodando em http://localhost:${PORT}`);
 });

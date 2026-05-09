@@ -1,7 +1,7 @@
 {
-  "name": "sportflow-manager",
+  "name": "relay-by-bentus",
   "version": "1.0.0",
-  "description": "Sistema web para gerenciamento esportivo de personal trainers, assessorias e equipes.",
+  "description": "Relay by Bentus: dados que guiam, resultados que falam.",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
